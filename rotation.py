@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 # Use a single complex dtype for numpy everywhere.
 DTYPE = np.complex128
@@ -45,8 +46,8 @@ def to_bloch(g: np.ndarray) -> Bloch:
 # n1, n2 are two orthogonal Bloch-sphere axes (n1 . n2 == 0)
 # TODO: fill in the two orthogonal rotation axes (each a length-3
 # unit vector [x, y, z])
-n1 = np.array([np.nan, np.nan, np.nan])
-n2 = np.array([np.nan, np.nan, np.nan])
+n1 = np.array([-np.tan(3*np.pi/8), 1, np.tan(3*np.pi/8)])/(1+2*(np.tan(3*np.pi/8))**2)
+n2 = np.array([INV_SQRT2, np.sqrt(2.0)*np.tan(3*np.pi/8), -INV_SQRT2])/(1+2*(np.tan(3*np.pi/8))**2)
 
 # frame derived from the axes (given)
 # take the dot product of the Bloch axis with these
@@ -64,8 +65,18 @@ def n1n2n1_angles(b: Bloch) -> tuple[float, float, float, float]:
     the orthonormal frame defined above. Returns (alpha, beta, gamma, global_phase).
     """
     # TODO(student): implement using the steps above.
-    raise NotImplementedError("n1n2n1_angles is not implemented yet")
+    theta=(b.theta)/2; n=b.n; phase=b.alpha;
+    nsinphi=n*np.sin(theta)
+    term1=np.cos(theta)
+    term2=np.sin(theta)*np.dot(nsinphi,n1)
+    term3=np.sin(theta)*np.dot(nsinphi,n2)
+    term4=np.sin(theta)*np.dot(nsinphi,a3)
 
+    beta=np.arccos(np.sqrt(term1**2+term2**2))
+    alpha=np.arctan2((term3/np.cos(beta)-term1/np.sin(beta))/(term2/np.cos(beta)+term4/np.sin(beta)))
+    gamma=np.arctan2((term3/np.cos(beta)-term1/np.sin(beta))/(term2/np.cos(beta)-term4/np.sin(beta)))
+
+    return np.array([alpha,beta,gamma,phase])
 
 def approx_angle_with_tolerance(angle: float, tolerance: float) -> int:
     """Find an integer multiple k such that
@@ -80,9 +91,13 @@ def approx_angle_with_tolerance(angle: float, tolerance: float) -> int:
         min(|a - b|, TWO_PI - |a - b|) (so 0.01 and 2*pi - 0.01 count as close).
     """
     # TODO(student): implement using the hint above.
-    raise NotImplementedError("approx_angle_with_tolerance is not implemented yet")
-
-
+    k=0; PI=np.pi
+    difference = abs(math.fmod(k*LAMBDA_PI, 2*PI)-angle)
+    while min(difference, 2*PI-difference)>tolerance:
+        k=k+1
+        difference = abs(math.fmod(k*LAMBDA_PI, 2*PI)-angle)
+    return k
+    
 def decompose_2x2(u: np.ndarray, tolerance: float) -> tuple[int, int, int]:
     """Approximate a 2x2 unitary `u` as a product of powers of M1 and M2:
 
