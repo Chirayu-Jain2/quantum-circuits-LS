@@ -125,4 +125,10 @@ def decompose_2x2(u: np.ndarray, tolerance: float) -> tuple[int, int, int]:
       3. Return (k, l, m).
     """
     # TODO(student): implement using the steps above.
-    raise NotImplementedError("decompose_2x2 is not implemented yet")
+    u_bloch = to_bloch(u)
+    angles = n1n2n1_angles(u_bloch)
+    k = approx_angle_with_tolerance(angles[0], tolerance)
+    l = approx_angle_with_tolerance(angles[1], tolerance)
+    m = approx_angle_with_tolerance(angles[2], tolerance)
+
+    return (k,l,m)
