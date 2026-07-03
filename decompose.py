@@ -15,7 +15,7 @@ Python list of gate objects, each exposing `to_unitary()`; gates are stored in
 order of application (the first gate is applied first, i.e. the rightmost matrix
 factor).
 
-Every function/method below is a stub for you to implement; See "Week 3.pdf" for the recommended order.
+Every function/method below is a stub for you to implement; See "03 - Completing the Decomposition.pdf" for the recommended order.
 """
 
 from __future__ import annotations
